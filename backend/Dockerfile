@@ -28,6 +28,7 @@ WORKDIR /app
 
 # Copy the compiled binary from the builder stage
 COPY --from=builder /app/backend/backend .
+COPY --from=builder /app/backend/db ./db
 
 # Expose the application port
 EXPOSE 8080

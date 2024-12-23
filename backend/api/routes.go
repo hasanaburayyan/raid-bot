@@ -7,5 +7,6 @@ import (
 
 func RegisterRoutes(r *gin.Engine) {
 	r.GET("/", handlers.HealthCheck)
-	r.GET("/raider", handlers.DummyRaider)
+	r.GET("/raider", handlers.GetRaiders)
+	r.POST("/raider", handlers.CreateRaider)
 }

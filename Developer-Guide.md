@@ -12,14 +12,8 @@ require (
 replace github.com/hasanaburayyan/raid-bot/SOME_MOD => /path/to/SOME_MOD
 ```
 
-## Test all projects
+## Run Project
 
 ```
-go test ./...
-```
-
-Start a single project
-
-```
-go run ./SOME_MOD
+docker-compose up
 ```
