@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - 8080:8080
+  db:
+    image: postgres
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    ports:
+      - 5400:5432
+    networks:
+      - main
+    environment:
+      POSTGRES_DB: raidhelper
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+
+volumes:
+  postgres_volume:
+
+networks:
+  main:
+    driver: bridge
