@@ -1,25 +1,16 @@
 package handlers
 
 import (
-	"context"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/hasanaburayyan/raid-bot/backend/db"
+	"github.com/hasanaburayyan/raid-bot/backend/db/controllers"
 	"github.com/hasanaburayyan/raid-bot/common/models"
 )
 
-func GetRaiders(c *gin.Context) {
-	conn, err := db.NewConnection(os.Getenv("DATABASE_URL"))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	defer conn.Close(context.Background())
-
-	raiders, err := db.GetRaiders(conn)
+func GetAllRaiders(c *gin.Context) {
+	raiders, err := controllers.GetRaiders()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -29,31 +20,60 @@ func GetRaiders(c *gin.Context) {
 }
 
 func CreateRaider(c *gin.Context) {
-	// Open a database connection
-	conn, err := db.NewConnection(os.Getenv("DATABASE_URL"))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	defer conn.Close(context.Background())
-
-	// Bind JSON body to the Raider struct
 	var raider models.Raider
 	if err := c.BindJSON(&raider); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}
 
-	// Generate a new UUID for the Raider
 	raider.ID = uuid.New().String()
 
-	// Insert the Raider into the database
-	err = db.CreateRaider(conn, raider)
+	err := controllers.CreateRaider(raider)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Respond with the created Raider
 	c.JSON(http.StatusOK, raider)
+}
+
+func GetRaider(c *gin.Context) {
+	id := c.Param("id")
+
+	raider, err := controllers.GetRaiderById(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "raider not found"})
+		return
+	}
+
+	c.JSON(http.StatusAccepted, raider)
+}
+
+func UpdateRaider(c *gin.Context) {
+	var updatedRaider models.Raider
+	if err := c.BindJSON(&updatedRaider); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Request Body"})
+		return
+	}
+
+	id := c.Param("id")
+
+	prev, err := controllers.UpdateRaiderById(id, updatedRaider)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusAccepted, prev)
+}
+
+func DeleteRaider(c *gin.Context) {
+	id := c.Param("id")
+	err := controllers.DeleteRaiderById(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusAccepted, gin.H{"message": "Raider deleted successfully"})
 }

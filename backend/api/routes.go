@@ -6,7 +6,18 @@ import (
 )
 
 func RegisterRoutes(r *gin.Engine) {
-	r.GET("/", handlers.HealthCheck)
-	r.GET("/raider", handlers.GetRaiders)
+	registerHealthRoutes(r)
+	registerRaiderRoutes(r)
+}
+
+func registerHealthRoutes(r *gin.Engine) {
+	r.GET("/health", handlers.HealthCheck)
+}
+
+func registerRaiderRoutes(r *gin.Engine) {
+	r.GET("/raider", handlers.GetAllRaiders)
+	r.GET("/raider/:id", handlers.GetRaider)
+	r.PUT("/raider/:id", handlers.UpdateRaider)
 	r.POST("/raider", handlers.CreateRaider)
+	r.DELETE("/raider/:id", handlers.DeleteRaider)
 }

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"context"
+	"fmt"
 	"log"
 	"os"
 
@@ -15,17 +15,24 @@ func main() {
 
 	api.RegisterRoutes(r)
 
-	dbUrl := os.Getenv("DATABASE_URL")
-	conn, err := db.NewConnection(dbUrl)
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
-	}
-	defer conn.Close(context.Background())
+	host := getEnv("DB_HOST", "localhost")
+	dbPort := getEnv("DB_PORT", "5400")
+	dbUser := getEnv("DB_USER", "admin")
+	dbPass := getEnv("DB_PASSWORD", "admin")
+	dbName := getEnv("DB_NAME", "raidhelper")
 
-	err = db.RunMigrations(conn, "./db/sql")
-	if err != nil {
-		log.Fatalf("Failed to run migrations: %v", err)
-	}
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", host, dbUser, dbPass, dbName, dbPort)
+	log.Println(dsn)
+	db.InitDatabase(dsn)
+
+	db.AutoMigrations()
 
 	r.Run()
+}
+
+func getEnv(key string, defaultValue string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return defaultValue
 }

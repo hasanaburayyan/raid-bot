@@ -1,7 +1,7 @@
 package models
 
 type Class struct {
-	Name  string   `json:"name"`
-	Specs []string `json:"specs"`
-	Roles []string `json:"roles"`
+	Name  string   `gorm:"type:text" json:"name"`
+	Specs []string `gorm:"type:text[]" json:"specs"`
+	Roles []string `gorm:"type:text[]" json:"roles"`
 }
