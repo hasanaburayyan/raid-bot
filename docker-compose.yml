@@ -17,6 +17,14 @@ services:
       - postgres
     networks:
       - main
+  bot:
+    build:
+      context: .
+      dockerfile: discord/Dockerfile
+    networks:
+      - main
+    depends_on:
+      - backend
   postgres:
     image: postgres
     volumes:
