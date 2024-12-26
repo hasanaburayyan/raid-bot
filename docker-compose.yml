@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
   backend:
@@ -13,10 +13,13 @@ services:
       - DB_PASSWORD=admin
       - DB_USER=admin
       - DB_NAME=raidhelper
+      - VAULT_ADDR=http://vault:8200 # Vault connection for backend
     depends_on:
       - postgres
+      # - vault
     networks:
       - main
+
   bot:
     build:
       context: .
@@ -25,6 +28,7 @@ services:
       - main
     depends_on:
       - backend
+
   postgres:
     image: postgres
     volumes:
@@ -37,6 +41,21 @@ services:
       POSTGRES_DB: raidhelper
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
+
+  # TODO: Think if I really wanna open this can of worms
+  # vault:
+  #   image: hashicorp/vault
+  #   container_name: vault
+  #   ports:
+  #     - 8200:8200
+  #   environment:
+  #     VAULT_DEV_ROOT_TOKEN_ID: root          # Development mode root token
+  #     VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+  #   command: server -dev
+  #   networks:
+  #     - main
+  #   cap_add:
+  #     - IPC_LOCK                          # Prevent sensitive data from being swapped to disk
 
 volumes:
   postgres_volume:

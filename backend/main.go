@@ -7,10 +7,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hasanaburayyan/raid-bot/backend/api"
+	"github.com/hasanaburayyan/raid-bot/backend/auth"
 	"github.com/hasanaburayyan/raid-bot/backend/db"
 )
 
 func main() {
+	auth.LoadKeys()
+
 	r := gin.Default()
 
 	api.RegisterRoutes(r)
@@ -26,7 +29,7 @@ func main() {
 	db.InitDatabase(dsn)
 
 	db.AutoMigrations()
-
+	db.SeedData()
 	r.Run()
 }
 
